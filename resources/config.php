@@ -89,6 +89,41 @@
     # Crystal alignment programs
     $strat_align = array('XOalign', 'dials.align_crystal');
 
+    # Places to search for autoprocessing and screening statuses. File scraping is done if no database value is available.
+    # Name on datacollectionpage => (folder, log file, grep search string for success, database key for matching)
+    # If multiple search strings are required combine them with \| e.g. 'term1\|term2'
+    $ap_statuses = array(
+        'locations' => array('/processed', 'tmp'),
+
+        'types' => array(
+            'screening' => array(
+                "Mosflm" => array('simple_strategy/', 'strategy_native.log', 'Phi start'),
+                "EDNA" => array('edna/', 'summary.html', 'Selected spacegroup'),
+            ),
+            'autoproc' => array(
+                "Fast DP" => array('fast_dp/', 'fast_dp.log', 'I/sigma', 'fast_dp'),
+                
+                "Xia2/3dii" => array('xia2/3dii-run/', 'xia2.txt' , 'I/sigma', 'xia2 3dii'),
+                "DIALS" => array('xia2/dials-run/', 'xia2.txt' , 'I/sigma', 'xia2 dials'),
+                
+                "Xia2/Multiplex" => array('xia2.multiplex/', 'xia2.multiplex.log' , 'clustering summary', 'xia2.multiplex'),
+                
+                "autoPROC" => array('autoPROC/ap-run/', 'autoPROC.log', 'Normal termination', 'autoPROC'),            
+            ),
+            'downstream' => array(
+                "Fast EP" => array('fast_ep/', 'fast_ep.log', 'Best hand:'),
+                "Dimple" => array('fast_dp/dimple/', 'refmac5_restr.log', 'DPI'),
+                "MrBUMP" => array('auto_mrbump/', 'MRBUMP.log', 'Looks like MrBUMP succeeded'),
+                "Big EP/XDS" => array('big_ep/', '/xia2/3dii-run/big_ep*.log', 'Results for'),
+                "Big EP/DIALS" => array('big_ep/', '/xia2/dials-run/big_ep_*.log', 'Results for\|Residues'),
+            ),
+            // Non MX autoprocessing - uses processing job table (no log files to scan)
+            'zocalo' => array(
+                "*" => array('', '', '', '*')
+            )
+        )
+    );
+
     # Active MQ - Set to empty string to disable
     $activemq_server = 'tcp://activemq.server.ac.uk';
     $activemq_rp_queue = '/queue/zocolo.name';
@@ -101,9 +136,8 @@
     $visit_directory = '/dls/<%=BEAMLINENAME%>/data/<%=YEAR%>/<%=VISIT%>';
 
     # Diffraction image snapshots
-    $jpeg_location = '<%=VISITDIR%>/jpegs/<%=DIR%>/<%=FILE%>.jpeg';
-    $jpeg_thumb_location = '<%=VISITDIR%>/jpegs/<%=DIR%>/<%=FILE%>.thumb.jpeg';
-
+    $jpeg_location = '<%=VISITDIR%>/jpegs/<%=IMDIRECTORY%>/<%=IMFILE%>.jpeg';
+    $jpeg_thumb_location = '<%=VISITDIR%>/jpegs/<%=IMDIRECTORY%>/<%=IMFILE%>.thumb.jpeg';
 
     # Email addresses, comma separate for multiple recepients
     # - Email templates in assets/emails in plain and html/ format
